@@ -1,0 +1,145 @@
+/**************************************************************************
+ * @author Jason Altschuler
+ *
+ * @tags edge detection, image analysis, computer vision, AI, machine learning
+ *
+ * PURPOSE: Edge detector
+ *
+ * ALGORITHM: Prewitt edge detector algorithm
+ *
+ * For full documentation, see the README
+  ************************************************************************/
+
+package se233.project1.model.detector;
+
+import se233.project1.model.grayscale.Grayscale;
+import se233.project1.view.ImageViewer;
+import se233.project1.model.util.Threshold;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+
+public class PrewittEdgeDetector extends GaussianEdgeDetector {
+   
+   /*********************************************************************
+    * Convolution kernels
+    *********************************************************************/
+
+   private final static double[][] X_kernel = {{-1, 0, 1},
+                                               {-1, 0, 1},
+                                               {-1, 0, 1}};
+
+   private final static double[][] Y_kernel = {{1, 1, 1},
+                                               {0, 0, 0},
+                                               {-1, -1, -1}};
+
+   /*********************************************************************
+    * Implemented abstract methods
+    *********************************************************************/
+
+   /**
+    * @Override
+    * {{-1, 0, 1}, {-1, 0, 1}, {-1, 0, 1}}
+    */
+   public double[][] getXkernel() {
+      return PrewittEdgeDetector.X_kernel;
+   }
+   
+   /**
+    * @Override
+    * {{1, 1, 1}, {0, 0, 0}, {-1, -1, -1}}
+    */
+   public double[][] getYkernel() {
+      return PrewittEdgeDetector.Y_kernel;
+   }
+
+   
+   /*********************************************************************
+    * Constructor 
+    **********************************************************************/
+   
+   /**
+    * All work is done in constructor.
+    * @param filePath path to image
+    */
+   public PrewittEdgeDetector(String filePath) {
+      // read image and get pixels
+      BufferedImage originalImage;
+      try {
+         originalImage = ImageIO.read(new File(filePath));
+         findEdges(Grayscale.imgToGrayPixels(originalImage), false);
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
+   }
+   
+   /**
+    * All work is done in constructor.
+    * <P> Uses L2 norm by default.
+    * @param imageld
+    */
+   public PrewittEdgeDetector(int[][] image) {
+      findEdges(image, false);
+   }
+   
+   /**
+    * All work is done in constructor. 
+    * <P> Gives option to use L1 or L2 norm.
+    */
+   public PrewittEdgeDetector(int[][] image, boolean L1norm) {
+      findEdges(image, L1norm);
+   }
+   
+
+
+   /*********************************************************************
+    * Unit testing
+    * @throws IOException 
+    *********************************************************************/
+
+   /**
+    * Example run. 
+    * <P> Displays detected edges next to orignal image.
+    * @param args
+    * @throws IOException
+    */
+   public static void main(String[] args) throws IOException {
+      // read image and get pixels
+      String img = args[0];
+      BufferedImage originalImage = ImageIO.read(new File(img));
+      int[][] pixels = Grayscale.imgToGrayPixels(originalImage);
+
+      // run SobelEdgeDetector
+      final long startTime = System.currentTimeMillis();
+      PrewittEdgeDetector sed = new PrewittEdgeDetector(pixels);
+      final long endTime = System.currentTimeMillis();
+
+      // print timing information
+      final double elapsed = (double) (endTime - startTime) / 1000;
+      System.out.println("Prewitt Edge Detector took " + elapsed + " seconds.");
+      System.out.println("Threshold = " + sed.threshold);
+
+      // display edges
+      boolean[][] edges = sed.getEdges();
+      BufferedImage edges_image = Threshold.applyThresholdReversed(edges);
+      BufferedImage[] toShow = {originalImage, edges_image};
+      String title = "Prewitt Edge Detector by Jason Altschuler";
+      ImageViewer.showImages(toShow, title);
+   }
+
+   //added
+   private BufferedImage edgeDetectedImage;
+   public PrewittEdgeDetector(BufferedImage originalImage) {
+      int[][] grayPixels = Grayscale.imgToGrayPixels(originalImage);
+      findEdges(grayPixels, false);
+      edgeDetectedImage = Threshold.applyThresholdReversed(getEdges());
+   }
+
+   public BufferedImage getEdgeDetectedImage() {
+      return edgeDetectedImage;
+   }
+
+}

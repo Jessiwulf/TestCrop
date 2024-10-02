@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.Group?>
+
+<AnchorPane maxHeight="700.0" maxWidth="1000.0" prefHeight="700.0" prefWidth="1000.0"
+            xmlns="http://javafx.com/javafx/8.0.171"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="se233.project1.controller.AllCustomHandler">
+    <!-- Top Button Bar -->
+    <HBox alignment="CENTER_LEFT" layoutY="0.0" prefHeight="30.0" prefWidth="1000.0"
+          style="-fx-background-color: #FFFFFF; -fx-border-color: #A8DADC; -fx-border-width: 0 0 3 0;">
+        <ToggleButton fx:id="edgeBtn" mnemonicParsing="false" text="Edge detector"
+                      onAction="#handleEdgeButtonAction"/>
+        <ToggleButton fx:id="cropBtn" mnemonicParsing="false" text="Crop" onAction="#handleCropButtonAction"/>
+    </HBox>
+
+    <!-- File Selection Area -->
+    <HBox layoutY="40.0" spacing="10.0" alignment="CENTER_LEFT" style="-fx-padding: 10px;">
+        <!-- Drop Zone -->
+        <Label fx:id="dropFileLabel" text="Drop an Image here" alignment="CENTER" prefHeight="50.0" prefWidth="480.0"
+               style="-fx-background-color: #F1FAEE; -fx-border-color: #457B9D; -fx-border-width: 2; -fx-font-size: 16px;"
+               onDragOver="#handleDragOver" onDragDropped="#handleDrop"/>
+        <!-- Choose File Button -->
+        <Button fx:id="chooseFileBtn" text="Choose File" style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;"
+                onAction="#handleChooseFileAction"/>
+        <Label text="Current file: " layoutY="40.0" alignment="CENTER" prefHeight="10" prefWidth="100"/>
+        <Label fx:id="currentFileName" text=" " alignment="CENTER" prefHeight="10" prefWidth="200"/>
+    </HBox>
+
+
+    <Label layoutY="110.0" prefHeight="100.0" prefWidth="1000.0" text="Crop"
+           style="-fx-font-size: 20px; -fx-text-fill: #1D3557;-fx-background-color: #FFFFFF" alignment="CENTER"/>
+    <!-- Edge Detection Options (Slider + Buttons) -->
+    <VBox fx:id="edgeParamsPane" layoutY="110.0" prefHeight="100.0" prefWidth="1000.0" spacing="10.0" visible="true"
+          style="-fx-background-color: #FFFFFF; -fx-padding: 10px;">
+        <Label text="Edge Detection Options" style="-fx-font-size: 14px; -fx-text-fill: #1D3557;"/>
+        <HBox spacing="10.0" alignment="CENTER">
+            <!-- Filter Selection -->
+            <ToggleButton fx:id="prewittBtn" text="Prewitt"
+                          style="-fx-background-color: #457B9D; -fx-text-fill: #FFFFFF;"
+                          onAction="#handlePrewittButtonAction"/>
+            <ToggleButton fx:id="robertsCrossBtn" text="Roberts Cross"
+                          style="-fx-background-color: #457B9D; -fx-text-fill: #FFFFFF;"
+                          onAction="#handleRobertsCrossButtonAction"/>
+            <ToggleButton fx:id="laplacianBtn" text="Laplacian"
+                          style="-fx-background-color: #457B9D; -fx-text-fill: #FFFFFF;"
+                          onAction="#handleLaplacianButtonAction"/>
+        </HBox>
+
+    </VBox>
+
+    <!-- Main Content Area (Image Preview + Processed Image) -->
+    <VBox layoutY="200.0" prefHeight="520.0" prefWidth="1000.0" spacing="10.0"
+          style="-fx-background-color: #FFFFFF;">
+        <HBox prefHeight="250.0" prefWidth="1000.0" spacing="10.0" style="-fx-padding: 10px;">
+            <!-- Image Preview -->
+            <VBox alignment="CENTER" prefWidth="480.0" spacing="10.0">
+                <Label text="Original Image"
+                       style="-fx-font-size: 14px; -fx-text-fill: #1D3557; -fx-padding: 0 0 5px 0;"/>
+                <StackPane fx:id="parentPane" alignment="CENTER">
+                    <ImageView fx:id="preImage" fitHeight="300.0" fitWidth="480.0" pickOnBounds="true"
+                               preserveRatio="true" style="-fx-border-color: #457B9D; -fx-border-width: 2;"/>
+                    <Group fx:id="imageLayer" />
+                </StackPane>
+            </VBox>
+
+            <!-- Processed Image Preview -->
+            <VBox alignment="CENTER" prefWidth="480.0" spacing="10.0">
+                <!-- Moved Processed Image Label Up -->
+                <Label text="Processed Image"
+                       style="-fx-font-size: 14px; -fx-text-fill: #1D3557; -fx-padding: 0 0 5px 0;"/>
+                <ImageView fx:id="postImage" fitHeight="300.0" fitWidth="480.0" pickOnBounds="true"
+                           preserveRatio="true" style="-fx-border-color: #457B9D; -fx-border-width: 2;"/>
+            </VBox>
+        </HBox>
+
+        <!-- Navigation Buttons and Progress Bar -->
+        <HBox spacing="10.0" alignment="CENTER" prefHeight="70.0">
+            <Label text="File name:"/>
+            <Label fx:id="currentFile" text="No file chosen"/>
+            <Label fx:id="fileNumber" text="0/0"/>
+            <Button fx:id="prevBtn" mnemonicParsing="false" text="Previous"
+                    style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;" onAction="#navigatePrevious"/>
+            <Button fx:id="nextBtn" mnemonicParsing="false" text="Next"
+                    style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;" onAction="#navigateNext"/>
+            <Button fx:id="generateBtn" text="Generate"
+                    style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;" onAction="#generateImage"/>
+            <ProgressBar fx:id="progressBar" prefWidth="250.0" progress="0.0" style="-fx-accent: #457B9D;"/>
+            <Button fx:id="saveBtn" text="Save" style="-fx-background-color: #1D3557; -fx-text-fill: #FFFFFF;"
+                    onAction="#saveImage"/>
+        </HBox>
+    </VBox>
+</AnchorPane>
